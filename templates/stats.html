@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/script.js"></script>
+</head>
+<body>
+
+<h2>統計（{{selected_file}}）</h2>
+
+<p>回答数 {{total}}</p>
+<p>正解数 {{correct}}</p>
+<p>正答率 {% if total %}{{ (correct/total*100)|round(1) }}{% else %}0{% endif %} %</p>
+
+<h2>分野別</h2>
+
+<table>
+  <tr>
+    <th>分野</th>
+    <th>正解</th>
+    <th>回答</th>
+    <th>正答率</th>
+  </tr>
+
+  {% for r in by_field %}
+  <tr>
+    <td>{{r[0]}}</td>
+    <td>{{r[1]}}</td>
+    <td>{{r[2]}}</td>
+    <td>{% if r[2] %}{{ (r[1]/r[2]*100)|round(1) }}{% else %}0{% endif %} %</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/ranking">間違った問題</a> | <a href="/progress">学習進捗</a> | <a href="/">戻る</a></p>
+
+</body>
+</html>

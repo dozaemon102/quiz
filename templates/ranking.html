@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/script.js"></script>
+</head>
+<body>
+
+<h1>間違った問題（{{selected_file}}）</h1>
+<p class="muted">ミス回数が多い順に表示します（「あなたの回答」は直近の誤答）。</p>
+
+<table>
+  <tr>
+    <th>ミス</th>
+    <th>No</th>
+    <th>分野</th>
+    <th>問題文</th>
+    <th>あなたの回答</th>
+    <th>正解</th>
+    <th>解説</th>
+  </tr>
+
+  {% for r in rows %}
+  <tr>
+    <td>{{r["mistakes"]}}</td>
+    <td>{{r["problem_no"]}}</td>
+    <td>{{r["field"]}}</td>
+    <td>{{r["question"]}}</td>
+    <td>{{r["selected_text"]}}</td>
+    <td>{{r["correct_text"]}}</td>
+    <td>
+      <details class="explain">
+        <summary>表示</summary>
+        <div class="explain-body">{{r["explanation"]}}</div>
+      </details>
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/stats">統計</a> | <a href="/progress">学習進捗</a> | <a href="/">戻る</a></p>
+
+</body>
+</html>

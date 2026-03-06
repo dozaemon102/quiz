@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/script.js"></script>
+</head>
+<body>
+
+<p><a href="/home">中断してスタートへ戻る</a></p>
+
+<h2>{{index}} / {{total}}</h2>
+
+<h3>{{problem["問題文"]}}</h3>
+
+<form method="post">
+
+{% for key,val in choices %}
+
+<label>
+<input id="choice-{{ loop.index }}" type="radio" name="answer" value="{{key}}">
+<span class="choice-num">{{ loop.index }}.</span>
+<span class="choice-text">{{ val }}</span>
+</label>
+<br>
+
+{% endfor %}
+
+<br>
+
+<button type="submit">回答</button>
+
+</form>
+
+</body>
+</html>

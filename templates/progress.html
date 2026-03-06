@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/script.js"></script>
+</head>
+<body>
+
+<h1>学習進捗（{{selected_file}}）</h1>
+
+<h2>CSV進捗</h2>
+<p>全問題 {{file_total}}</p>
+<p>解いた問題 {{file_solved}}</p>
+<p>進捗 {{file_rate}} %</p>
+
+<div style="width:400px;border:1px solid gray">
+  <div style="background:green;width:{{file_rate}}%;color:white">
+    {{file_rate}} %
+  </div>
+</div>
+
+<h2>分野別</h2>
+<table>
+  <tr>
+    <th>分野</th>
+    <th>解いた</th>
+    <th>全問題</th>
+    <th>進捗</th>
+  </tr>
+  {% for r in field_rows %}
+  <tr>
+    <td>{{r[0]}}</td>
+    <td>{{r[1]}}</td>
+    <td>{{r[2]}}</td>
+    <td>{{r[3]}} %</td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/stats">統計</a> | <a href="/">戻る</a></p>
+
+</body>
+</html>

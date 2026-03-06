@@ -1,0 +1,11 @@
+# 仮想環境
+.venv/
+
+# データベース
+quiz.db
+
+# Pythonバージョン指定
+.python-version
+
+# uvのロックファイル
+uv.lock

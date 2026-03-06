@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quiz App</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/script.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>Quiz App</h1>
+  <p class="muted">ローカル専用の資格対策クイズ</p>
+
+  <div class="card">
+    <h2>① 問題CSVを選択</h2>
+    <form action="/setup" method="post" class="row">
+      <select name="file" class="select">
+        {% for f in files %}
+          <option value="{{f}}" {% if selected_file==f %}selected{% endif %}>{{f}}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">読み込み</button>
+    </form>
+  </div>
+
+  {% if fields %}
+  <div class="card">
+    <h2>② 出題条件</h2>
+    <form action="/start_quiz" method="post">
+
+      <h3>分野</h3>
+      <div class="chips">
+        <label class="chip">
+          <input type="checkbox" name="fields" value="all" checked>
+          <span>すべて</span>
+        </label>
+        {% for f in fields %}
+        <label class="chip">
+          <input type="checkbox" name="fields" value="{{f}}">
+          <span>{{f}}</span>
+        </label>
+        {% endfor %}
+      </div>
+
+      <h3>問題数</h3>
+      <select name="count" class="select">
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="all">全問</option>
+      </select>
+
+      <div class="spacer"></div>
+
+      <label class="checkbox">
+        <input type="checkbox" name="wrong">
+        <span>復習モード（間違えた問題のみ）</span>
+      </label>
+
+      <div class="spacer"></div>
+      <button type="submit">クイズ開始</button>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="footer-links">
+    <a href="/stats">統計</a>
+    <a href="/ranking">間違った問題</a>
+    <a href="/progress">学習進捗</a>
+    <a href="/clear" class="danger-link">履歴クリア</a>
+  </div>
+</div>
+
+</body>
+</html>

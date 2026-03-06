@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="/static/style.css">
+<script src="/static/script.js"></script>
+</head>
+<body>
+
+<p><a href="/home">中断してスタートへ戻る</a></p>
+
+<h2>
+{% if is_correct %}
+⭕ 正解
+{% else %}
+❌ 不正解
+{% endif %}
+</h2>
+
+<p>あなたの回答 : {{selected}}</p>
+<p>あなたの回答内容 : {{selected_text}}</p>
+<p>正解 : {{correct}}</p>
+<p>正解内容 : {{correct_text}}</p>
+
+<h3>解説</h3>
+<p>{{ problem.get("解説","") }}</p>
+
+<a id="next-link" href="/next">次へ</a>
+
+</body>
+</html>
