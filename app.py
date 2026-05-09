@@ -7,7 +7,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, session
 
 app = Flask(__name__)
-app.secret_key = "quizapp"
+app.secret_key = os.environ.get("SECRET_KEY", "quizapp-change-me-in-production")
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DB = os.path.join(BASE_DIR, "quiz.db")
@@ -571,6 +571,5 @@ if __name__ == "__main__":
     try:
         _backfill_result_fields_if_needed()
     except Exception:
-        # Best-effort only; app should still run even if CSVs are missing/invalid.
         pass
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=False)

@@ -1,0 +1,13 @@
+[Unit]
+Description=Quiz App
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/quiz
+Environment="SECRET_KEY=ここに安全なランダム文字列を入れる"
+ExecStart=/home/pi/quiz/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:5000 app:app
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
