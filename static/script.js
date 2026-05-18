@@ -1,3 +1,17 @@
+document.addEventListener("DOMContentLoaded", function () {
+  const allBox = document.querySelector('input[name="fields"][value="all"]');
+  const fieldBoxes = Array.from(document.querySelectorAll('input[name="fields"]:not([value="all"])'));
+
+  if (allBox) {
+    allBox.addEventListener("change", function () {
+      if (this.checked) fieldBoxes.forEach(cb => cb.checked = false);
+    });
+    fieldBoxes.forEach(cb => cb.addEventListener("change", function () {
+      if (this.checked) allBox.checked = false;
+    }));
+  }
+});
+
 document.addEventListener("keydown", function (e) {
   if (e.key === "1") selectByIndex(0);
   if (e.key === "2") selectByIndex(1);
