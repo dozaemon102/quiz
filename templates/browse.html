@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>問題一覧</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<h1>問題一覧（{{selected_file}}）</h1>
+
+<form method="get" action="/browse" class="row" style="margin-bottom:16px;">
+  <select name="field" class="select" onchange="this.form.submit()">
+    <option value="all" {% if selected_field=="all" %}selected{% endif %}>すべての分野</option>
+    {% for f in fields %}
+    <option value="{{f}}" {% if selected_field==f %}selected{% endif %}>{{f}}</option>
+    {% endfor %}
+  </select>
+</form>
+
+<p class="muted">{{problems|length}} 問</p>
+
+<table>
+  <tr>
+    <th>No</th>
+    <th>分野</th>
+    <th>問題文</th>
+    <th>正解</th>
+    <th>解説</th>
+  </tr>
+  {% for p in problems %}
+  <tr>
+    <td>{{p["No"]}}</td>
+    <td>{{p.get("分野","")}}</td>
+    <td>{{p["問題文"]}}</td>
+    <td>
+      <span class="choice-num">{{p["正解"]}}</span>
+      <span class="choice-text">{{p.get("選択肢" + p["正解"], "")}}</span>
+    </td>
+    <td>
+      {% if p.get("解説") %}
+      <details class="explain">
+        <summary>表示</summary>
+        <div class="explain-body">{{p["解説"]}}</div>
+      </details>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</table>
+
+<p><a href="/">戻る</a></p>
+
+</body>
+</html>

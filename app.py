@@ -576,6 +576,29 @@ def progress():
     )
 
 
+@app.route("/browse")
+def browse():
+
+    selected_file = session.get("file")
+    if not selected_file:
+        return redirect("/")
+
+    problems = load_problems(selected_file)
+    fields = sorted({(p.get("分野") or "").strip() for p in problems if (p.get("分野") or "").strip()})
+
+    selected_field = request.args.get("field", "all")
+    if selected_field != "all":
+        problems = [p for p in problems if (p.get("分野") or "").strip() == selected_field]
+
+    return render_template(
+        "browse.html",
+        selected_file=selected_file,
+        problems=problems,
+        fields=fields,
+        selected_field=selected_field,
+    )
+
+
 def get_csv_files():
 
     files = []
