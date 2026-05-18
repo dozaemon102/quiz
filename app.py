@@ -211,32 +211,42 @@ def start_quiz():
 
     selected_fields = request.form.getlist("fields")
     count = request.form.get("count")
-    wrong_only = request.form.get("wrong")
+    mode = request.form.get("mode", "all")  # all | wrong | untried
 
     if "all" not in selected_fields:
         problems = [p for p in problems if p["分野"] in selected_fields]
 
-    if wrong_only:
-
+    if mode == "wrong":
         conn = sqlite3.connect(DB)
         c = conn.cursor()
-
         c.execute("""
         SELECT problem_id
         FROM results
-        WHERE correct=0
-        """)
-
-        wrong_ids = [r[0] for r in c.fetchall()]
-
+        WHERE file=?
+          AND id IN (SELECT MAX(id) FROM results WHERE file=? GROUP BY problem_id)
+          AND correct=0
+        """, (file, file))
+        wrong_ids = {r[0] for r in c.fetchall()}
+        conn.close()
         problems = [p for p in problems if p["problem_id"] in wrong_ids]
 
+    elif mode == "untried":
+        conn = sqlite3.connect(DB)
+        c = conn.cursor()
+        c.execute("SELECT DISTINCT problem_id FROM results WHERE file=?", (file,))
+        tried_ids = {r[0] for r in c.fetchall()}
         conn.close()
+        problems = [p for p in problems if p["problem_id"] not in tried_ids]
 
     random.shuffle(problems)
 
-    if count != "all":
-        problems = problems[:int(count)]
+    if count:
+        try:
+            n = int(count)
+            if n < len(problems):
+                problems = problems[:n]
+        except ValueError:
+            pass
 
     # Store only lightweight quiz state in session (cookie-safe)
     session["quiz_file"] = file
@@ -386,30 +396,39 @@ def stats():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
+    # 回答数 = 一度でも回答した問題数（distinct）
     c.execute("""
-    SELECT COUNT(*)
+    SELECT COUNT(DISTINCT problem_id)
     FROM results
     WHERE file=?
     """, (selected_file,))
     total = c.fetchone()[0]
 
+    # 正解数 = 最新の回答が正解の問題数
     c.execute("""
     SELECT COUNT(*)
-    FROM results
-    WHERE correct=1
-    AND file=?
-    """, (selected_file,))
+    FROM (
+        SELECT problem_id
+        FROM results
+        WHERE file=?
+          AND id IN (SELECT MAX(id) FROM results WHERE file=? GROUP BY problem_id)
+          AND correct=1
+    )
+    """, (selected_file, selected_file))
     correct = c.fetchone()[0]
 
+    # 分野別: 問題ごとの最新回答を基準に集計
     c.execute("""
-    SELECT field,
-    SUM(correct),
-    COUNT(*)
-    FROM results
-    WHERE field IS NOT NULL AND field != ''
-    AND file=?
+    SELECT field, SUM(correct), COUNT(*)
+    FROM (
+        SELECT problem_id, field, correct
+        FROM results
+        WHERE file=?
+          AND id IN (SELECT MAX(id) FROM results WHERE file=? GROUP BY problem_id)
+          AND field IS NOT NULL AND field != ''
+    )
     GROUP BY field
-    """, (selected_file,))
+    """, (selected_file, selected_file))
     by_field = c.fetchall()
 
     conn.close()
@@ -433,12 +452,12 @@ def ranking():
     conn = sqlite3.connect(DB)
     c = conn.cursor()
 
-    # Mistakes per problem + last wrong selection (by answered_at, id)
+    # 最新回答が不正解の問題のみ表示（再回答で正解済みは除外）
     c.execute(
         """
         SELECT
           r.problem_id,
-          COUNT(*) AS mistakes,
+          COUNT(CASE WHEN r.correct=0 THEN 1 END) AS mistakes,
           (
             SELECT r2.selected
             FROM results r2
@@ -449,12 +468,17 @@ def ranking():
             LIMIT 1
           ) AS last_selected
         FROM results r
-        WHERE r.correct = 0 AND r.file = ?
+        WHERE r.file = ?
         GROUP BY r.problem_id
+        HAVING (
+            SELECT correct FROM results r2
+            WHERE r2.problem_id = r.problem_id AND r2.file = ?
+            ORDER BY r2.id DESC LIMIT 1
+        ) = 0
         ORDER BY mistakes DESC
         LIMIT 50
         """,
-        (selected_file, selected_file),
+        (selected_file, selected_file, selected_file),
     )
     raw = c.fetchall()
 

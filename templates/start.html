@@ -45,18 +45,23 @@
       </div>
 
       <h3>問題数</h3>
-      <select name="count" class="select">
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="all">全問</option>
-      </select>
+      <input type="number" name="count" min="1" placeholder="空白で全問" class="select" style="min-width:160px;">
 
-      <div class="spacer"></div>
-
-      <label class="checkbox">
-        <input type="checkbox" name="wrong">
-        <span>復習モード（間違えた問題のみ）</span>
-      </label>
+      <h3>出題モード</h3>
+      <div class="chips">
+        <label class="chip">
+          <input type="radio" name="mode" value="all" checked>
+          <span>すべて</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="mode" value="wrong">
+          <span>復習（間違えた問題のみ）</span>
+        </label>
+        <label class="chip">
+          <input type="radio" name="mode" value="untried">
+          <span>未挑戦のみ</span>
+        </label>
+      </div>
 
       <div class="spacer"></div>
       <button type="submit">クイズ開始</button>
